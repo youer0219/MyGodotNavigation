@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dawuf4ndq2orn"]
+
+[ext_resource type="Texture2D" uid="uid://bmxltbfrusjgs" path="res://基于B站视频的横板寻路/Scenes/TileMapPathFind/Gfx/GraphPoint.png" id="1_d74xg"]
+
+[node name="GraphPoint" type="Sprite2D"]
+texture = ExtResource("1_d74xg")

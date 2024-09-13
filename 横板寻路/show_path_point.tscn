@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cnt1kv40ssfnd"]
+
+[ext_resource type="Script" path="res://横板寻路/show_path_point.gd" id="1_7hg1g"]
+
+[node name="ShowPathPoint" type="Node2D"]
+script = ExtResource("1_7hg1g")

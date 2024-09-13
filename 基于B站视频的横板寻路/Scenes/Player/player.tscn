@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://56qq5gacmf6y"]
+
+[ext_resource type="Texture2D" uid="uid://bqu1fvm2u2qk5" path="res://基于B站视频的横板寻路/Scenes/Player/Gfx/GodotDude.png" id="1_adglv"]
+[ext_resource type="Script" path="res://基于B站视频的横板寻路/Scenes/Player/player.gd" id="1_xjp0o"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_em38n"]
+size = Vector2(20, 51)
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 4
+script = ExtResource("1_xjp0o")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 2
+texture = ExtResource("1_adglv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_em38n")
