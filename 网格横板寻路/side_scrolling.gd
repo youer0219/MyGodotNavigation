@@ -9,7 +9,7 @@ const DOWN_POINT_WEIGHT = 100
 
 func _ready():
 	path_finder_ready()
-	test_path_finder()
+	#test_path_finder()
 
 func path_finder_ready():
 	# 栅格上用来寻路的区域 = 该地图的包围矩形，包围所有图层中的已使用（非空）的图块。
@@ -105,6 +105,9 @@ func get_true_id_path(from_id: Vector2i, to_id: Vector2i)->Array[Vector2i]:
 	new_path += astar.get_id_path(true_from_id,true_to_id) + end_path
 	
 	return new_path
+
+func get_local_pos_map_cell(pos:Vector2)->Vector2i:
+	return local_to_map(pos)
 
 func test_path_finder():
 	debug_print_path(get_true_id_path(Vector2i(3,4),Vector2i(-5,-3)))

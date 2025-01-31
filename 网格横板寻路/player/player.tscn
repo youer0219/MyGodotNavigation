@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://vy5s7t7v8npm"]
+[gd_scene load_steps=3 format=3 uid="uid://vy5s7t7v8npm"]
 
 [ext_resource type="Texture2D" uid="uid://dmdynsg2yyrag" path="res://网格横板寻路/player/player.png" id="1_mu0k0"]
 
-[node name="player" type="Sprite2D"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_130d7"]
+radius = 6.0
+height = 14.0
+
+[node name="player" type="CharacterBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_mu0k0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_130d7")
