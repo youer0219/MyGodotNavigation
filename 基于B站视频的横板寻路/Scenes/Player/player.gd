@@ -91,5 +91,3 @@ func Jump(new_velocity:Vector2)->Vector2:
 			new_velocity.y = JUMP_VELOCITY
 	
 	return new_velocity
-
-

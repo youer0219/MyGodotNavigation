@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://exnqmci8gimf"
-path="res://.godot/imported/自定义节点横板寻路.png-b9dc5eab10ed7c4ec85a8752d82f3844.ctex"
+path="res://.godot/imported/自定义节点横板寻路.png-bd504cff5ea58e7f05a0f5e3b7c0c0ea.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://README图片/自定义节点横板寻路.png"
-dest_files=["res://.godot/imported/自定义节点横板寻路.png-b9dc5eab10ed7c4ec85a8752d82f3844.ctex"]
+source_file="res://自定义节点横板寻路.png"
+dest_files=["res://.godot/imported/自定义节点横板寻路.png-bd504cff5ea58e7f05a0f5e3b7c0c0ea.ctex"]
 
 [params]
 

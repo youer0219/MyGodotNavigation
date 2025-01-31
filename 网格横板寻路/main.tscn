@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b06vh4y6w0rc1"]
 
-[ext_resource type="TileSet" uid="uid://c4igqsbtrsp2g" path="res://横板寻路/tile_set.tres" id="1_yewhf"]
-[ext_resource type="Script" path="res://横板寻路/side_scrolling.gd" id="2_lhx17"]
+[ext_resource type="TileSet" uid="uid://c4igqsbtrsp2g" path="res://网格横板寻路/tile_set.tres" id="1_yewhf"]
+[ext_resource type="Script" path="res://网格横板寻路/side_scrolling.gd" id="2_lhx17"]
 
 [node name="Main" type="Node2D"]
 

@@ -3,7 +3,7 @@ extends Node2D
 
 @export var color:Color = Color.AQUAMARINE
 
-const SHOWPIONT = preload("res://横板寻路/show_path_point.tscn")
+const SHOWPIONT = preload("res://网格横板寻路/show_path_point.tscn")
 
 func _draw():
 	draw_circle(Vector2.ZERO,5.0,color)
