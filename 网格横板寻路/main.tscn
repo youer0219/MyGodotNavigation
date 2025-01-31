@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://b06vh4y6w0rc1"]
+[gd_scene load_steps=5 format=3 uid="uid://b06vh4y6w0rc1"]
 
 [ext_resource type="TileSet" uid="uid://c4igqsbtrsp2g" path="res://网格横板寻路/tile_set.tres" id="1_yewhf"]
 [ext_resource type="Script" path="res://网格横板寻路/side_scrolling.gd" id="2_lhx17"]
+[ext_resource type="PackedScene" uid="uid://vy5s7t7v8npm" path="res://网格横板寻路/player/player.tscn" id="3_s6ihx"]
+[ext_resource type="Script" path="res://网格横板寻路/player/player.gd" id="4_v4jo7"]
 
 [node name="Main" type="Node2D"]
 
@@ -14,3 +16,7 @@ script = ExtResource("2_lhx17")
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(16, 16)
 zoom = Vector2(3, 3)
+
+[node name="player" parent="." node_paths=PackedStringArray("grid") instance=ExtResource("3_s6ihx")]
+script = ExtResource("4_v4jo7")
+grid = NodePath("../TileMap")

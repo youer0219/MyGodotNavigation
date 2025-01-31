@@ -24,6 +24,9 @@ func path_finder_ready():
 	# 更新AStarGrid2D以准备搜索路径
 	astar.update()
 	
+	update_points()
+
+func update_points():
 	# 判断可行点
 	for x in range(astar.region.position.x,astar.region.end.x):
 		for y in range(astar.region.position.y,astar.region.end.y):
