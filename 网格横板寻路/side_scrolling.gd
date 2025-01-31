@@ -5,7 +5,13 @@ var platform_path: Array[Vector2i]
 var platform_edge_path:Array[Vector2i]
 var platform_down_path:Array[Vector2i]
 
+const DOWN_POINT_WEIGHT = 100
+
 func _ready():
+	path_finder_ready()
+	test_path_finder()
+
+func path_finder_ready():
 	# 栅格上用来寻路的区域 = 该地图的包围矩形，包围所有图层中的已使用（非空）的图块。
 	astar.region = get_used_rect()
 	# 网格大小设置
@@ -63,8 +69,6 @@ func _ready():
 	# 生成落下时的点
 	for edge_point in platform_edge_path:
 		down_point_judge(edge_point)
-	
-	get_true_id_path(Vector2i(3,5),Vector2i(-5,-4))
 
 func down_point_judge(point:Vector2i):
 	var down_point = point + Vector2i(0,1)
@@ -73,13 +77,12 @@ func down_point_judge(point:Vector2i):
 	if down_point_tile_data and !down_point_tile_data.get_custom_data("unwalkable"):
 		if !platform_path.has(down_point) and !platform_edge_path.has(down_point):
 			astar.set_point_solid(down_point,false)
+			astar.set_point_weight_scale(down_point,DOWN_POINT_WEIGHT)
 			var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(down_point)),Color.RED)
 			add_child(new_point)
 			platform_down_path.append(down_point)
 			down_point_judge(down_point)
 
-
-## 目前基本可行，但还是没有理想效果……
 func get_true_id_path(from_id: Vector2i, to_id: Vector2i)->Array[Vector2i]:
 	var new_path:Array[Vector2i]
 	
@@ -97,5 +100,14 @@ func get_true_id_path(from_id: Vector2i, to_id: Vector2i)->Array[Vector2i]:
 		true_to_id = true_to_id + Vector2i(0,1)
 	
 	new_path += astar.get_id_path(true_from_id,true_to_id) + end_path
-	#print(new_path)
+	
 	return new_path
+
+func test_path_finder():
+	debug_print_path(get_true_id_path(Vector2i(3,4),Vector2i(-5,-3)))
+
+func debug_print_path(path:Array[Vector2i]):
+	print(path)
+	for point in path:
+		var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(point)),Color.CHOCOLATE)
+		add_child(new_point)
