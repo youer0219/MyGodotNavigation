@@ -9,10 +9,10 @@ const TinyJumpVelocity := -370.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@export var _pathFind2D:TileMapPathFind
-var _path :TileMapPathFind.Stack = TileMapPathFind.Stack.new()
-var _target:TileMapPathFind.PointInfo = null
-var _prevTarget:TileMapPathFind.PointInfo = null
+@export var _pathFind2D:TileMapLayerPathFind
+var _path :TileMapLayerPathFind.Stack = TileMapLayerPathFind.Stack.new()
+var _target:TileMapLayerPathFind.PointInfo = null
+var _prevTarget:TileMapLayerPathFind.PointInfo = null
 var JumpDistanceHeightThreshold:float = 120.0
 
 
@@ -32,7 +32,6 @@ func DoPathFinding():
 	for point in _path._stack:
 		num += 1
 		print("point",num,":  ",point.Position)
-
 
 
 func _physics_process(delta):

@@ -1,5 +1,5 @@
-class_name TileMapPathFind
-extends TileMap
+class_name TileMapLayerPathFind
+extends TileMapLayer
 
 class PointInfo:
 	var isFallTile:bool
@@ -66,7 +66,7 @@ var _pointInfoList:Array[PointInfo]
 func _ready():
 	
 	_graphpoint = preload("res://基于B站视频的横板寻路/Scenes/TileMapPathFind/GraphPoint.tscn")
-	_usedTiles = get_used_cells(COLLISION_LAYER)
+	_usedTiles = get_used_cells()
 	
 	BuildGraph()
 
@@ -238,7 +238,7 @@ func ConnectJumpPoints(p1:PointInfo):
 func ConnectDiagonalJumpRightEdgeToLeftEdge(p1:PointInfo,p2:PointInfo):
 	if p1.isRightEdge:
 		var p1Map:Vector2 = local_to_map(p1.Position)
-		var p2Map:Vector2 = local_to_map(p2.Position)
+		var p2Map:Vector2 = local_to_map(p2.Position) + Vector2i(0,1)
 		
 		if p2.isLeftEdge && p2.Position.x > p1.Position.x && p2.Position.y > p1.Position.y && p2Map.distance_to(p1Map) < JumpDistance:
 			print("p1Map: ",p1Map)
@@ -250,7 +250,7 @@ func ConnectDiagonalJumpRightEdgeToLeftEdge(p1:PointInfo,p2:PointInfo):
 func ConnectDiagonalJumpLeftEdgeToRightEdge(p1:PointInfo,p2:PointInfo):
 	if p1.isLeftEdge:
 		var p1Map:Vector2 = local_to_map(p1.Position)
-		var p2Map:Vector2 = local_to_map(p2.Position)
+		var p2Map:Vector2 = local_to_map(p2.Position) + Vector2i(0,1)
 		
 		if p2.isRightEdge && p2.Position.x < p1.Position.x && p2.Position.y > p1.Position.y && p2Map.distance_to(p1Map) < JumpDistance:
 			_astarGraph.connect_points(p1.PointID,p2.PointID)
@@ -469,7 +469,7 @@ func TileAboveExist(tile:Vector2i)->bool:
 
 # 如果该点位置为空，返回true
 func TileEmpty(tile:Vector2i,layer:int = COLLISION_LAYER)->bool:
-	if get_cell_source_id(layer,tile) == CELL_IS_EMPTY:
+	if get_cell_source_id(tile) == CELL_IS_EMPTY:
 		return true
 	return false
 

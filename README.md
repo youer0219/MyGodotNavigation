@@ -9,8 +9,11 @@
 - [原项目GitHub链接](https://github.com/solarstrings/Godot4.x_Advanced2DPlatformerPathFinding)
 - 我把他的C#脚本改成了GD脚本，其他素材基本来自该作者
 - BUG记录：
-	- 适配tilemaplayer后会出现错误跳跃的bug
 	- 寻找下坠点时只考虑了一边（已修复）
+	- 适配tilemaplayer后会出现错误跳跃的bug
+		- 主要问题在于某两点（p1Map: (27, 10)、p2Map: (28, 14)）错误链接到一起了。
+		- 因为纵向的五格差距在坐标上只有4的数值差，所以临时的修复方法就是更改计算公式。
+		- 以及为什么tilemap没有这个问题，tilemaplayer就会出现这个问题呢？
 
 ![alt text](自定义节点横板寻路.png)
 

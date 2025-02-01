@@ -9,11 +9,11 @@ const TinyJumpVelocity := -370.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@export var _pathFind2D:TileMapPathFind
+@export var _pathFind2D:TileMapLayerPathFind
 @export var _player:CharacterBody2D
-var _path :TileMapPathFind.Stack = TileMapPathFind.Stack.new()
-var _target:TileMapPathFind.PointInfo = null
-var _prevTarget:TileMapPathFind.PointInfo = null
+var _path :TileMapLayerPathFind.Stack = TileMapLayerPathFind.Stack.new()
+var _target:TileMapLayerPathFind.PointInfo = null
+var _prevTarget:TileMapLayerPathFind.PointInfo = null
 var JumpDistanceHeightThreshold:float = 120.0
 @onready var path_find_timer = $PathFindTimer
 
