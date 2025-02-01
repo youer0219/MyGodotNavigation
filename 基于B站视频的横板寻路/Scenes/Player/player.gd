@@ -28,11 +28,13 @@ func GoToNextPointInPath():
 func DoPathFinding():
 	_path = _pathFind2D.GetPlaform2DPath(self.position,get_global_mouse_position())
 	GoToNextPointInPath()
+	debug_show_path()
+
+func debug_show_path():
 	var num = 0
 	for point in _path._stack:
 		num += 1
 		print("point",num,":  ",point.Position)
-
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("click"):

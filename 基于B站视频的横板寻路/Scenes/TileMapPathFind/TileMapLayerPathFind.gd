@@ -241,9 +241,6 @@ func ConnectDiagonalJumpRightEdgeToLeftEdge(p1:PointInfo,p2:PointInfo):
 		var p2Map:Vector2 = local_to_map(p2.Position) + Vector2i(0,1)
 		
 		if p2.isLeftEdge && p2.Position.x > p1.Position.x && p2.Position.y > p1.Position.y && p2Map.distance_to(p1Map) < JumpDistance:
-			print("p1Map: ",p1Map)
-			print("p2Map: ",p2Map)
-			print("p2Map.distance_to(p1Map): ",p2Map.distance_to(p1Map))
 			_astarGraph.connect_points(p1.PointID,p2.PointID)
 			DrawDebugLine(p1.Position,p2.Position,Color.DARK_MAGENTA)
 
@@ -254,7 +251,7 @@ func ConnectDiagonalJumpLeftEdgeToRightEdge(p1:PointInfo,p2:PointInfo):
 		
 		if p2.isRightEdge && p2.Position.x < p1.Position.x && p2.Position.y > p1.Position.y && p2Map.distance_to(p1Map) < JumpDistance:
 			_astarGraph.connect_points(p1.PointID,p2.PointID)
-			DrawDebugLine(p1.Position,p2.Position,Color(0,1,0,1))
+			DrawDebugLine(p1.Position,p2.Position,Color.BLACK)
 
 func ConnectHorizontalPlatformJumps(p1:PointInfo,p2:PointInfo):
 	if p1.PointID == p2.PointID:return
