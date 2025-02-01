@@ -28,6 +28,10 @@ func GoToNextPointInPath():
 func DoPathFinding():
 	_path = _pathFind2D.GetPlaform2DPath(self.position,get_global_mouse_position())
 	GoToNextPointInPath()
+	var num = 0
+	for point in _path._stack:
+		num += 1
+		print("point",num,":  ",point.Position)
 
 
 
