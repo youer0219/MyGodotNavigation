@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 @export var grid:TileMap
+@export var speed:int = 100
 
 var target_path :Array[Vector2i]
 var curr_cell:Vector2i:
@@ -8,9 +9,25 @@ var curr_cell:Vector2i:
 		return grid.get_local_pos_map_cell(position)
 
 func _process(delta):
+	do_find_path()
 	move(delta)
 
 func move(delta:float):
+	fall(delta)
+
+	if target_path and not target_path.is_empty():
+		
+		plat_move(target_path[0])
+		
+		if target_path[0].y < curr_cell.y:
+			jump()
+		
+		if curr_cell == target_path[0]:
+			target_path.remove_at(0)
+	
+	move_and_slide()
+
+func do_find_path():
 	if Input.is_action_just_pressed("click"):
 		var mouse_position = get_global_mouse_position()
 		var start_coord = curr_cell
@@ -18,19 +35,6 @@ func move(delta:float):
 		var calculated_path = grid.get_true_id_path(start_coord,target_coord)
 		if calculated_path.size() > 0:
 			target_path = calculated_path
-	
-	fall(delta)
-	if target_path and not target_path.is_empty():
-		if target_path[0].y == curr_cell.y:
-			plat_move(target_path[0])
-		elif target_path[0].y < curr_cell.y:
-			jump()
-		if curr_cell == target_path[0]:
-			target_path.remove_at(0)
-	
-	move_and_slide()
-
-
 
 func jump(jump_cells = 1):
 	if is_on_floor():
@@ -38,12 +42,21 @@ func jump(jump_cells = 1):
 
 func fall(delta:float):
 	if !is_on_floor():
-		velocity.y += 98 * delta
+		velocity.y += ProjectSettings.get_setting("physics/2d/default_gravity") * delta
 
-func plat_move(next_cell):
-	if next_cell.x > curr_cell.x:
-		velocity.x = 100
-	elif next_cell.x < curr_cell.x:
-		velocity.x = -100
+func plat_move(next_cell:Vector2i):
+	var next_pos := map_to_local(next_cell)
+	var direction:Vector2 = Vector2.ZERO
+	
+	if next_pos.x - 5 > position.x:
+		direction.x = 1
+	elif next_pos.x + 5 < position.x:
+		direction.x = -1
+	
+	if direction:
+		velocity.x = direction.x * speed
 	else:
-		velocity.x = 0
+		velocity.x = move_toward(velocity.x, 0, speed)
+
+func map_to_local(cell:Vector2i)->Vector2:
+	return grid.map_to_local(cell)
