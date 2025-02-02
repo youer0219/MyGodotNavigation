@@ -24,6 +24,9 @@ func move(delta:float):
 		
 		if curr_cell == target_path[0]:
 			target_path.remove_at(0)
+		
+		if target_path.is_empty():
+			velocity.x = 0
 	
 	move_and_slide()
 
@@ -38,7 +41,7 @@ func do_find_path():
 
 func jump(jump_cells = 1):
 	if is_on_floor():
-		velocity.y = -500
+		velocity.y = -300
 
 func fall(delta:float):
 	if !is_on_floor():
@@ -52,6 +55,7 @@ func plat_move(next_cell:Vector2i):
 		direction.x = 1
 	elif next_pos.x + 5 < position.x:
 		direction.x = -1
+
 	
 	if direction:
 		velocity.x = direction.x * speed
