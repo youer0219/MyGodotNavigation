@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 @export var grid:TileMap
-@export var speed:int = 100
+@export var speed:int = 60
 
 var target_path :Array[Vector2i]
 var curr_cell:Vector2i:
@@ -22,11 +22,13 @@ func move(delta:float):
 		if target_path[0].y < curr_cell.y:
 			jump()
 		
-		if curr_cell == target_path[0]:
+		if curr_cell == target_path[0] and target_path.size() > 1:
 			target_path.remove_at(0)
 		
-		if target_path.is_empty():
-			velocity.x = 0
+		if target_path.size() == 1:
+			if abs(position.x - map_to_local(target_path[0]).x) < 1:
+				target_path.remove_at(0)
+				velocity.x = 0
 	
 	move_and_slide()
 
@@ -41,7 +43,7 @@ func do_find_path():
 
 func jump(jump_cells = 1):
 	if is_on_floor():
-		velocity.y = -300
+		velocity.y = -400
 
 func fall(delta:float):
 	if !is_on_floor():
@@ -51,11 +53,10 @@ func plat_move(next_cell:Vector2i):
 	var next_pos := map_to_local(next_cell)
 	var direction:Vector2 = Vector2.ZERO
 	
-	if next_pos.x - 5 > position.x:
+	if next_pos.x - 1> position.x:
 		direction.x = 1
-	elif next_pos.x + 5 < position.x:
+	elif next_pos.x + 1 < position.x:
 		direction.x = -1
-
 	
 	if direction:
 		velocity.x = direction.x * speed

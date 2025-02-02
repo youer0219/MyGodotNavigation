@@ -5,7 +5,8 @@ var platform_path: Array[Vector2i]
 var platform_edge_path:Array[Vector2i]
 var platform_down_path:Array[Vector2i]
 
-const DOWN_POINT_WEIGHT = 100
+const DOWN_POINT_WEIGHT := 10
+const EDGE_POINT_WEIGHT := 10
 
 func _ready():
 	path_finder_ready()
@@ -55,6 +56,7 @@ func update_points():
 			var left_down_point_tile_data = get_cell_tile_data(0,left_down_point)
 			if left_down_point_tile_data and !left_down_point_tile_data.get_custom_data("unwalkable"):
 				astar.set_point_solid(left_point,false)
+				astar.set_point_weight_scale(left_point,EDGE_POINT_WEIGHT)
 				var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(left_point)),Color.BLACK)
 				add_child(new_point)
 				platform_edge_path.append(left_point)
@@ -65,6 +67,7 @@ func update_points():
 			var right_down_point_tile_data = get_cell_tile_data(0,right_down_point)
 			if right_down_point_tile_data and !right_down_point_tile_data.get_custom_data("unwalkable"):
 				astar.set_point_solid(right_point,false)
+				astar.set_point_weight_scale(right_point,EDGE_POINT_WEIGHT)
 				var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(right_point)),Color.BLACK)
 				add_child(new_point)
 				platform_edge_path.append(right_point)
