@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://b06vh4y6w0rc1"]
 
 [ext_resource type="TileSet" uid="uid://c4igqsbtrsp2g" path="res://网格横板寻路/tile_set.tres" id="1_yewhf"]
-[ext_resource type="Script" path="res://网格横板寻路/side_scrolling.gd" id="2_lhx17"]
+[ext_resource type="Script" uid="uid://iahhb7ghjknn" path="res://网格横板寻路/side_scrolling.gd" id="2_lhx17"]
 [ext_resource type="PackedScene" uid="uid://vy5s7t7v8npm" path="res://网格横板寻路/player/player.tscn" id="3_s6ihx"]
-[ext_resource type="Script" path="res://网格横板寻路/player/player.gd" id="4_v4jo7"]
+[ext_resource type="Script" uid="uid://cad0qvsjq42rn" path="res://网格横板寻路/player/player.gd" id="4_v4jo7"]
 
 [node name="Main" type="Node2D"]
 

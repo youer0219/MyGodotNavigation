@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=4 uid="uid://3px2euow68r7"]
 
 [ext_resource type="Texture2D" uid="uid://7l760y7tfry4" path="res://基于B站视频的横板寻路/Scenes/TileMapPathFind/Gfx/Block.png" id="1_6xo1a"]
-[ext_resource type="Script" path="res://基于B站视频的横板寻路/Scenes/TileMapPathFind/TileMapLayerPathFind.gd" id="2_trdvg"]
+[ext_resource type="Script" uid="uid://csief12ovwn54" path="res://基于B站视频的横板寻路/Scenes/TileMapPathFind/TileMapLayerPathFind.gd" id="2_trdvg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4ba8m"]
 texture = ExtResource("1_6xo1a")
