@@ -11,7 +11,7 @@ var platform_down_path:Array[Vector2i]
 
 
 const PLATFROM_POINT_WEIGHT := 1
-const AIR_POINT_WEIGHT := 10
+const AIR_POINT_WEIGHT := 100
 
 func _ready():
 	path_finder_ready()
