@@ -11,13 +11,5 @@ func clear():
 
 
 func show_path(cells:Array[Vector2i]):
-	clear()
-	
-	for cell in cells:
-		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.RED)
-		new_point.z_index = 100
-		add_child(new_point)
-
-
-
-#
+	var global_cells = PathShowTool.change_map_cells_to_global_cells(cells,map)
+	PathShowTool.draw_path(self,global_cells,Color.BLUE_VIOLET,10)

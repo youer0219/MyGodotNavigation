@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bfn5kynm7n6vl"]
+
+[ext_resource type="Script" uid="uid://7ticsvlff5t3" path="res://path_show_tool/path_show_tool.gd" id="1_01ip7"]
+[ext_resource type="PackedScene" uid="uid://csxuflajh27s1" path="res://path_show_tool/path_show_executor.tscn" id="2_pmpxt"]
+
+[node name="PathShowTool" type="Node2D"]
+script = ExtResource("1_01ip7")
+
+[node name="PathShowExecutor" parent="." instance=ExtResource("2_pmpxt")]
+
+[node name="PathShowExecutor2" parent="." instance=ExtResource("2_pmpxt")]
+
+[node name="PathShowExecutor3" parent="." instance=ExtResource("2_pmpxt")]
+
+[node name="PathShowExecutor4" parent="." instance=ExtResource("2_pmpxt")]
+
+[node name="PathShowExecutor5" parent="." instance=ExtResource("2_pmpxt")]
