@@ -27,11 +27,11 @@ func move(delta:float):
 				if num == 0:
 					continue
 				if target_path[num].y < target_path[num-1].y:
-					print("(abs(target_path[num].y - target_path[0].y) + 1: ",(abs(target_path[num].y - target_path[0].y) + 1))
+					#print("(abs(target_path[num].y - target_path[0].y) + 1: ",(abs(target_path[num].y - target_path[0].y) + 1))
 					jump_cells = abs(target_path[num].y - target_path[0].y) + 1
 				else:
 					break
-			print("jump_cells: ",jump_cells)
+			#print("jump_cells: ",jump_cells)
 			jump(jump_cells)
 		
 		if curr_cell == target_path[0] and target_path.size() > 1:
@@ -52,7 +52,7 @@ func do_find_path():
 		var calculated_path = grid.get_true_id_path(start_coord,target_coord)
 		if calculated_path.size() > 0:
 			target_path = calculated_path
-			print("target_path: ",target_path)
+			#print("target_path: ",target_path)
 
 func jump(jump_cells = 1):
 	# 计算所需跳跃高度（像素）

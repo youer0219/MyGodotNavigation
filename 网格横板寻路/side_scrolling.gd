@@ -10,7 +10,6 @@ const EDGE_POINT_WEIGHT := 10
 
 func _ready():
 	path_finder_ready()
-	#test_path_finder()
 
 func path_finder_ready():
 	# 栅格上用来寻路的区域 = 该地图的包围矩形，包围所有图层中的已使用（非空）的图块。
@@ -90,7 +89,8 @@ func down_point_judge(point:Vector2i):
 			down_point_judge(down_point)
 
 func get_true_id_path(from_id: Vector2i, to_id: Vector2i)->Array[Vector2i]:
-	var new_path:Array[Vector2i]
+	## TODO:缺少对路径起点终点合法性的判断
+	var new_path:Array[Vector2i] = []
 	
 	# 判断起点位置 如果在不是平台边的空中，就向下找合适的点位
 	var true_from_id:Vector2i = from_id
@@ -111,9 +111,6 @@ func get_true_id_path(from_id: Vector2i, to_id: Vector2i)->Array[Vector2i]:
 
 func get_local_pos_map_cell(pos:Vector2)->Vector2i:
 	return local_to_map(pos)
-
-func test_path_finder():
-	debug_print_path(get_true_id_path(Vector2i(3,4),Vector2i(-5,-3)))
 
 func debug_print_path(path:Array[Vector2i]):
 	print(path)
