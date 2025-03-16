@@ -15,7 +15,8 @@ func _process(delta):
 func move(delta:float):
 	fall(delta)
 	if target_path:
-		print(target_path)
+		var global_paths = PathShowTool.change_tilemap_cells_to_global_cells(target_path,grid)
+		PathShowTool.draw_path(self,global_paths,Color.BLUE,6.0)
 	if target_path and not target_path.is_empty():
 		
 		plat_move(target_path[0])

@@ -40,13 +40,6 @@ func clear_draw_path(node:Node):
 	else:
 		push_warning(node,"对象没有请求过绘制却要求清除绘制!")
 
-func change_map_cells_to_global_cells(cells:Array[Vector2i],map:TileMapLayer)->Array[Vector2]:
-	var global_cells:Array[Vector2] = []
-	for cell in cells:
-		var local_cell := map.map_to_local(cell)
-		global_cells.append(map.to_global(local_cell))
-	return global_cells
-
 
 ## 寻找这个ID对应的执行者。不存在即为第一次请求绘制。存在即返回对应的执行者。
 func find_path_show_executor_by_id(id:int)->PathShowExecutor:
@@ -70,6 +63,20 @@ func find_spare_path_show_executor()->PathShowExecutor:
 	add_child(new_path_show_executor)
 	return new_path_show_executor
 
-
 func get_path_show_executors()->Array[PathShowExecutor]:
 	return Array(get_children(),TYPE_OBJECT,"Node2D",PathShowExecutor)
+
+
+func change_tilemaplayer_cells_to_global_cells(cells:Array[Vector2i],map:TileMapLayer)->Array[Vector2]:
+	var global_cells:Array[Vector2] = []
+	for cell in cells:
+		var local_cell := map.map_to_local(cell)
+		global_cells.append(map.to_global(local_cell))
+	return global_cells
+
+func change_tilemap_cells_to_global_cells(cells:Array[Vector2i],map:TileMap)->Array[Vector2]:
+	var global_cells:Array[Vector2] = []
+	for cell in cells:
+		var local_cell := map.map_to_local(cell)
+		global_cells.append(map.to_global(local_cell))
+	return global_cells
