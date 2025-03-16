@@ -12,6 +12,7 @@
 - [原作者YouTube链接](https://www.youtube.com/@TheSolarString)
 - [原项目GitHub链接](https://github.com/solarstrings/Godot4.x_Advanced2DPlatformerPathFinding)
 - 我把他的C#脚本改成了GD脚本，其他素材基本来自该作者
+    - 协议：[text](基于B站视频的横板寻路/LICENSE)
 - BUG记录：
 	- 寻找下坠点时只考虑了一边（已修复）
 	- 适配tilemaplayer后会出现错误跳跃的bug(临时修复)
