@@ -15,6 +15,3 @@ func _draw() -> void:
 
 func update_path():
 	queue_redraw()
-
-
-## draw 画出路径节点
