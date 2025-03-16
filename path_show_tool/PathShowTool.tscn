@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://7ticsvlff5t3" path="res://path_show_tool/path_show_tool.gd" id="1_01ip7"]
 [ext_resource type="PackedScene" uid="uid://csxuflajh27s1" path="res://path_show_tool/path_show_executor.tscn" id="2_pmpxt"]
 
-[node name="PathShowTool" type="Node2D"]
+[node name="PathShowTool" type="Node"]
 script = ExtResource("1_01ip7")
 
 [node name="PathShowExecutor" parent="." instance=ExtResource("2_pmpxt")]

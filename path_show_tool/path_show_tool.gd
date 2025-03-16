@@ -1,14 +1,15 @@
-extends Node2D
+extends Node
 
 const PATH_SHOW_EXECUTOR = preload("res://path_show_tool/path_show_executor.tscn")
 
 ## 节点请求绘制路径，传递全局坐标的路径数组和自身
 ## 根据自身ID判断是否存在绘制节点，如果存在，更新该节点的绘制；如果不存在，选择一个空闲的执行者进行绘制
 ## 如果是第一次，还会链接其离开树的信号，在此时删除路径。
+## 如果清除指定节点请求的绘制，将同时断开信号
 
 ## 不限制高峰时绘制执行者数量。但当绘制结束时，如果执行者节点数量超过 MAX_COMOMN_PATH_SHOW_EXECUTOR_NUM,就会删除执行者节点
 ## 请根据自己的绘制需求合理调节这个值
-const MAX_COMOMN_PATH_SHOW_EXECUTOR_NUM := 10
+const MAX_COMOMN_PATH_SHOW_EXECUTOR_NUM := 10 ##功能缺少测试
 
 func draw_path(node:Node,paths:Array[Vector2],path_color:Color = Color.ALICE_BLUE ,path_circle_radius:float = 1.0):
 	## 尝试在node.free()后传入node，编辑器直接报错。因此这里感觉不会被触发。
