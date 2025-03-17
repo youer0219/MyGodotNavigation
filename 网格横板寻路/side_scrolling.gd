@@ -2,8 +2,8 @@ extends TileMap
 
 var astar := AStarGrid2D.new()
 var platform_path: Array[Vector2i]
-var platform_edge_path:Array[Vector2i]
-var platform_down_path:Array[Vector2i]
+var platform_edge_path: Array[Vector2i]
+var platform_down_path: Array[Vector2i]
 
 const DOWN_POINT_WEIGHT := 10
 const EDGE_POINT_WEIGHT := 10
@@ -12,108 +12,126 @@ func _ready():
 	path_finder_ready()
 
 func path_finder_ready():
-	# 栅格上用来寻路的区域 = 该地图的包围矩形，包围所有图层中的已使用（非空）的图块。
+	# 栅格上用来寻路的区域 = 该地图的包围矩形
 	astar.region = get_used_rect()
 	# 网格大小设置
 	astar.cell_size = get_tileset().tile_size
 	
-	# 使其不再允许对角线穿过，而是直线运动
+	# 设置运动模式
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
-	# 更新AStarGrid2D以准备搜索路径
 	astar.update()
 	
 	update_points()
 
 func update_points():
 	# 判断可行点
-	for x in range(astar.region.position.x,astar.region.end.x):
-		for y in range(astar.region.position.y,astar.region.end.y):
-			# 默认全部不可达
-			var coord = Vector2i(x,y)
-			var tile_data := get_cell_tile_data(0,coord)
+	for x in range(astar.region.position.x, astar.region.end.x):
+		for y in range(astar.region.position.y, astar.region.end.y):
+			var coord = Vector2i(x, y)
+			var tile_data := get_cell_tile_data(0, coord)
 			astar.set_point_solid(coord)
-			# 判断哪些可达
+			
 			if tile_data and !tile_data.get_custom_data("unwalkable"):
-				var down_coord = coord + Vector2i(0,1)
-				var down_tile_data := get_cell_tile_data(0,down_coord)
+				var down_coord = coord + Vector2i(0, 1)
+				var down_tile_data := get_cell_tile_data(0, down_coord)
 				if down_tile_data and down_tile_data.get_custom_data("unwalkable"):
-					astar.set_point_solid(coord,false)
+					astar.set_point_solid(coord, false)
 					platform_path.append(coord)
-					var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(coord)),Color.AQUAMARINE)
+					# 调试显示点
+					var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(coord)), Color.AQUAMARINE)
 					add_child(new_point)
 	
-	# 判断平台边缘的地点
+	# 判断平台边缘点
 	for point in platform_path:
-		var left_point = point + Vector2i(-1,0)
-		var right_point = point + Vector2i(1,0)
-		
-		var left_point_tile_data = get_cell_tile_data(0,left_point)
-		if left_point_tile_data and !left_point_tile_data.get_custom_data("unwalkable"):
-			var left_down_point = left_point + Vector2i(0,1)
-			var left_down_point_tile_data = get_cell_tile_data(0,left_down_point)
-			if left_down_point_tile_data and !left_down_point_tile_data.get_custom_data("unwalkable"):
-				astar.set_point_solid(left_point,false)
-				astar.set_point_weight_scale(left_point,EDGE_POINT_WEIGHT)
-				var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(left_point)),Color.BLACK)
-				add_child(new_point)
-				platform_edge_path.append(left_point)
-		
-		var right_point_tile_data = get_cell_tile_data(0,right_point)
-		if right_point_tile_data and !right_point_tile_data.get_custom_data("unwalkable"):
-			var right_down_point = right_point + Vector2i(0,1)
-			var right_down_point_tile_data = get_cell_tile_data(0,right_down_point)
-			if right_down_point_tile_data and !right_down_point_tile_data.get_custom_data("unwalkable"):
-				astar.set_point_solid(right_point,false)
-				astar.set_point_weight_scale(right_point,EDGE_POINT_WEIGHT)
-				var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(right_point)),Color.BLACK)
-				add_child(new_point)
-				platform_edge_path.append(right_point)
+		check_edge_point(point + Vector2i(-1, 0))  # 左边缘
+		check_edge_point(point + Vector2i(1, 0))   # 右边缘
 	
-	# 生成落下时的点
+	# 生成下落点
 	for edge_point in platform_edge_path:
 		down_point_judge(edge_point)
 
-func down_point_judge(point:Vector2i):
-	var down_point = point + Vector2i(0,1)
-	var down_point_tile_data = get_cell_tile_data(0,down_point)
-	
-	if down_point_tile_data and !down_point_tile_data.get_custom_data("unwalkable"):
-		if !platform_path.has(down_point) and !platform_edge_path.has(down_point):
-			astar.set_point_solid(down_point,false)
-			astar.set_point_weight_scale(down_point,DOWN_POINT_WEIGHT)
-			var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(down_point)),Color.RED)
+func check_edge_point(point: Vector2i):
+	var tile_data = get_cell_tile_data(0, point)
+	if tile_data and !tile_data.get_custom_data("unwalkable"):
+		var down_point = point + Vector2i(0, 1)
+		var down_tile_data = get_cell_tile_data(0, down_point)
+		if down_tile_data and !down_tile_data.get_custom_data("unwalkable"):
+			astar.set_point_solid(point, false)
+			astar.set_point_weight_scale(point, EDGE_POINT_WEIGHT)
+			platform_edge_path.append(point)
+			# 调试显示点
+			var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(point)), Color.BLACK)
 			add_child(new_point)
-			platform_down_path.append(down_point)
-			down_point_judge(down_point)
 
-func get_true_id_path(from_id: Vector2i, to_id: Vector2i)->Array[Vector2i]:
-	## TODO:缺少对路径起点终点合法性的判断
-	var new_path:Array[Vector2i] = []
+func down_point_judge(point: Vector2i):
+	var current_point = point
+	while true:
+		current_point += Vector2i(0, 1)
+		if not astar.region.has_point(current_point):
+			break
+		
+		var tile_data = get_cell_tile_data(0, current_point)
+		if tile_data and !tile_data.get_custom_data("unwalkable"):
+			if !platform_path.has(current_point) and !platform_edge_path.has(current_point):
+				astar.set_point_solid(current_point, false)
+				astar.set_point_weight_scale(current_point, DOWN_POINT_WEIGHT)
+				platform_down_path.append(current_point)
+				# 调试显示点
+				var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(current_point)), Color.RED)
+				add_child(new_point)
+			else:
+				break
+		else:
+			break
+
+func get_true_id_path(from_id: Vector2i, to_id: Vector2i) -> Array[Vector2i]:
+	# 初始边界检查
+	if not astar.region.has_point(from_id) or not astar.region.has_point(to_id):
+		return []
 	
-	# 判断起点位置 如果在不是平台边的空中，就向下找合适的点位
-	var true_from_id:Vector2i = from_id
-	while astar.is_point_solid(true_from_id):
+	# 这里应该把空中的点都加入到可达点中的，由于没加，所以这段代码会造成额外的问题
+	#if astar.is_point_solid(from_id) or astar.is_point_solid(to_id):
+		#return []
+	
+	var new_path: Array[Vector2i] = []
+	
+	# 处理起点
+	var true_from_id := from_id
+	while astar.region.has_point(true_from_id) and astar.is_point_solid(true_from_id):
 		new_path.append(true_from_id)
-		true_from_id = true_from_id + Vector2i(0,1)
+		true_from_id += Vector2i(0, 1)
+	# 检查起点是否有效
+	if not astar.region.has_point(true_from_id) or astar.is_point_solid(true_from_id):
+		return []
 	
-	# 判断终点位置 如果在空中，需要找到其下的平台位置
-	var end_path:Array[Vector2i]
-	var true_to_id = to_id
-	while astar.is_point_solid(true_to_id):
+	# 处理终点
+	var end_path: Array[Vector2i] = []
+	var true_to_id := to_id
+	while astar.region.has_point(true_to_id) and astar.is_point_solid(true_to_id):
 		end_path.push_front(true_to_id)
-		true_to_id = true_to_id + Vector2i(0,1)
+		true_to_id += Vector2i(0, 1)
+	# 检查终点是否有效
+	if not astar.region.has_point(true_to_id) or astar.is_point_solid(true_to_id):
+		return []
 	
-	new_path += astar.get_id_path(true_from_id,true_to_id) + end_path
+	# 获取A*路径
+	var astar_path := astar.get_id_path(true_from_id, true_to_id)
+	if astar_path.is_empty():
+		return []
+	
+	# 合并路径
+	new_path += astar_path
+	new_path += end_path
 	
 	return new_path
 
-func get_local_pos_map_cell(pos:Vector2)->Vector2i:
+func get_local_pos_map_cell(pos: Vector2) -> Vector2i:
 	return local_to_map(pos)
 
-func debug_print_path(path:Array[Vector2i]):
+func debug_print_path(path: Array[Vector2i]):
 	print(path)
 	for point in path:
-		var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(point)),Color.CHOCOLATE)
+		var new_point = ShowPointPath.CreatePathPoint(to_global(map_to_local(point)), Color.CHOCOLATE)
 		add_child(new_point)
