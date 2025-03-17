@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://csxuflajh27s1"]
 
-[ext_resource type="Script" uid="uid://bif7pwkkbx22l" path="res://path_show_tool/path_show_executor.gd" id="1_ljayp"]
+[ext_resource type="Script" uid="uid://bif7pwkkbx22l" path="res://PathShowTool/path_show_executor.gd" id="1_ljayp"]
 
 [node name="PathShowExecutor" type="Node2D"]
 z_index = 4096

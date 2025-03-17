@@ -1,6 +1,7 @@
 extends Node
 
-const PATH_SHOW_EXECUTOR = preload("res://path_show_tool/path_show_executor.tscn")
+
+const PATH_SHOW_EXECUTOR = preload("uid://csxuflajh27s1")
 
 ## 节点请求绘制路径，传递全局坐标的路径数组和自身
 ## 根据自身ID判断是否存在绘制节点，如果存在，更新该节点的绘制；如果不存在，选择一个空闲的执行者进行绘制
