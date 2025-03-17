@@ -12,6 +12,6 @@ extends Node2D
 	#path_show.queue_free()
 
 func _on_timer_timeout() -> void:
-	var path := path_finder.get_id_path(Vector2i(3,3),map_layer.local_to_map(get_local_mouse_position()))
+	var path := path_finder.get_id_path(Vector2i(10,20),map_layer.local_to_map(get_local_mouse_position()))
 	if is_instance_valid(path_show):
 		path_show.show_path(path)
