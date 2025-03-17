@@ -41,6 +41,7 @@ func move(delta:float):
 			if abs(position.x - map_to_local(target_path[0]).x) < 1 and target_path[0].y == curr_cell.y:
 				target_path.remove_at(0)
 				velocity.x = 0
+				PathShowTool.draw_path_clear(self)
 	
 	move_and_slide()
 
