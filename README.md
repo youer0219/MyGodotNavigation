@@ -44,14 +44,14 @@
 
 ![alt text](基于网格寻路的横板寻路.png)
 
-## map-path-finder
+## PVZR_PathFinderDemo
 
 - 基于AstarGrid2D的横板寻路（简化版）
+	- 专门用于我的PVZR项目
 	- 这里只分为不可达点、平台点和空中点。优先平台点。
 	- 目前没有移动功能，只有一个路径显示功能（每隔1s更新一次）
 
-
-![alt text](map_path_finder.png)
+![alt text](PVZR_PathFinderDemo.png)
 
 ## PathShowTool
 

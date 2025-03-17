@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://nva56mxoycf"
-path="res://.godot/imported/map_path_finder.png-068186b733b1f10d68d4047deb53ab02.ctex"
+path="res://.godot/imported/PVZR_PathFinderDemo.png-d286bcaaefd9d84ff3af566454a7d902.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://map_path_finder.png"
-dest_files=["res://.godot/imported/map_path_finder.png-068186b733b1f10d68d4047deb53ab02.ctex"]
+source_file="res://PVZR_PathFinderDemo.png"
+dest_files=["res://.godot/imported/PVZR_PathFinderDemo.png-d286bcaaefd9d84ff3af566454a7d902.ctex"]
 
 [params]
 

@@ -1,14 +1,7 @@
 extends Node2D
 class_name PathShow
 
-
 @export var map:TileMapLayer
-
-
-func clear():
-	for child in get_children():
-		child.queue_free()
-
 
 func show_path(cells:Array[Vector2i]):
 	var global_cells = PathShowTool.change_tilemaplayer_cells_to_global_cells(cells,map)
