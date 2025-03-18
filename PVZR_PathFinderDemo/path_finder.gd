@@ -11,13 +11,12 @@ class_name PathFinder
 ## 4.添加了一个wall-edge使之更加偏向与跟随建筑移动
 
 const ENTITY_HEIGHT := 2
-const VECTOR2I_NULL := Vector2(-1,-1)
+const VECTOR2I_NULL := Vector2i(-1,-1)
 const MAP_HEIGHT := 24
 
 const PLATFROM_POINT_WEIGHT := 1
 const WALL_EDGE_POINT_WEIGHT := 10
 const AIR_POINT_WEIGHT := 20
-
 
 @export var map:TileMapLayer
 
@@ -25,6 +24,9 @@ var astar := AStarGrid2D.new()
 var platform_path: Array[Vector2i]
 var platform_edge_path:Array[Vector2i]
 var platform_down_path:Array[Vector2i]
+
+## 存储已经验证过的出水点
+var water_out_cell:Array[Vector2i] = []
 
 func _ready():
 	path_finder_ready()
@@ -64,20 +66,34 @@ func update_points():
 				add_child(new_point)
 
 func get_id_path(from:Vector2i,to:Vector2i)->Array[Vector2i]:
-	
-	if from.x < astar.region.position.x or from.x > astar.region.end.x:
+	if from.x <= astar.region.position.x or from.x >= astar.region.end.x:
 		return []
 	
-	if to.x < astar.region.position.x or to.x > astar.region.end.x:
+	if not astar.is_in_boundsv(to):
 		return []
 	
-	## 在水线下时，需要讲from映射到第一个顶部的空位置。
-	if from.y >= get_top_water_cell_y():
-		from = get_first_top_empty_cell(from)
+	var platfrom_from :Vector2i= find_platform_tile(from)
+	var platfrom_to := find_platform_tile(to)
+	if platfrom_to == VECTOR2I_NULL or platfrom_from == VECTOR2I_NULL:
+		return []
 	
-	if astar.is_in_bounds(to.x,to.y):
-		return astar.get_id_path(from,to)
-	return []
+	var path:Array[Vector2i] = astar.get_id_path(platfrom_from,platfrom_to) 
+	path.append(to)
+	
+	return path
+
+func get_first_top_empty_cell(cell:Vector2i)->Vector2i:
+	for top_cell_y in range(1,MAP_HEIGHT):
+		var new_cell := cell - Vector2i(0,top_cell_y)
+		if new_cell.y >= get_top_water_cell_y():
+			continue
+		if not astar.is_in_boundsv(new_cell):
+			continue
+		if get_used_cells().has(new_cell):
+			continue
+		return new_cell
+	
+	return VECTOR2I_NULL
 
 func is_solid_cell(cell:Vector2i)->bool:
 	## 禁止水线下的点
@@ -94,27 +110,46 @@ func is_solid_cell(cell:Vector2i)->bool:
 	
 	return false
 
-func get_first_top_empty_cell(cell:Vector2i)->Vector2i:
-	for top_cell_y in range(1,MAP_HEIGHT):
-		var new_cell := cell - Vector2i(0,top_cell_y)
-		if new_cell.y >= get_top_water_cell_y():
-			continue
-		if not astar.is_in_boundsv(new_cell):
-			continue
-		if get_used_cells().has(new_cell):
-			continue
-		return new_cell
+func find_platform_tile(input_coord: Vector2i) -> Vector2i:
+	var x = input_coord.x
+	var current_y = input_coord.y
 	
-	return VECTOR2I_NULL
+	# 判断搜索方向
+	if current_y <= get_top_water_cell_y():
+		# 向上搜索 (Y递减)
+		for y in range(current_y, get_top_water_cell_y()):
+			var coord = Vector2i(x, y)
+			if is_platform_cell(coord):
+				return coord
+	else:
+		# 向下搜索 (Y递增)
+		for y in range(get_top_water_cell_y() - 1, 0,-1):
+			var coord = Vector2i(x, y)
+			if is_platform_cell(coord):
+				return coord
+	
+	return VECTOR2I_NULL  # 未找到返回无效坐标
+
+func is_platform_cell(coord: Vector2i) -> bool:
+	# 1. 当前格子无瓦片
+	if is_used_cell(coord):
+		return false
+	
+	# 2. 上方格子无瓦片
+	for i in range(1,ENTITY_HEIGHT):
+		var above = Vector2i(coord.x, coord.y - i)
+		if coord.y > 0 and is_used_cell(above):
+			return false
+
+	# 3. 下方格子有瓦片，或者在水线上一格
+	var below = Vector2i(coord.x, coord.y + 1)
+	if not is_used_cell(below) and not coord.y + Vector2i.DOWN.y == get_top_water_cell_y():
+		return false
+
+	return true
 
 func is_used_cell(cell:Vector2i)->bool:
 	return get_used_cells().has(cell)
-
-func is_platform_cell(cell:Vector2i)->bool:
-	if cell.y + 1 == get_top_water_cell_y():
-		return true
-	
-	return not get_used_cells().has(cell) and get_used_cells().has(cell + Vector2i.DOWN)
 
 func is_wall_edge_cell(cell:Vector2i)->bool:
 	return get_used_cells().has(cell + Vector2i.RIGHT) or get_used_cells().has(cell + Vector2i.LEFT)
@@ -136,15 +171,22 @@ func filter_path(raw_path: Array[Vector2i]) -> Array[Vector2i]:
 	# 遍历路径寻找方向变化的关键点
 	for i in range(2, raw_path.size()):
 		
-		# 检测出水点 
-		if raw_path[i-1].y + 1 == get_top_water_cell_y() and raw_path[i].y + 1 == get_top_water_cell_y():
+		# 检测出水点
+		if water_out_cell.has(raw_path[i-1]):
+			filtered.append(raw_path[i-1])
+			continue
+		elif raw_path[i-1].y + 1 == get_top_water_cell_y() and raw_path[i].y + 1 == get_top_water_cell_y():
 			if get_used_cells().has(raw_path[i] + Vector2i.DOWN) and not get_used_cells().has(raw_path[i-1] + Vector2i.DOWN):
+				water_out_cell.append(raw_path[i-1])
 				filtered.append(raw_path[i-1])
 				continue
 	
 		var current_direction := raw_path[i] - raw_path[i-1]
 		# 检测到方向变化时记录转折点
 		if current_direction != previous_direction:
+			# 过滤掉同一竖直线上连续点的路径中间点（目前只会涉及三个点）
+			if raw_path[i].x == raw_path[i-1].x and raw_path[i].x == raw_path[i-2].x:
+				continue
 			filtered.append(raw_path[i-1])
 			previous_direction = current_direction
 	
