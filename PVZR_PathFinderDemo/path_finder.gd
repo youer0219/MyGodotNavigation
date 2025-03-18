@@ -8,17 +8,19 @@ class_name PathFinder
 	## 2.2 传入传出都采取全局坐标以兼容
 	## 2.3 寻路路径起点终点检查更加严格。起点、终点的映射需要单独的处理逻辑，不仅仅是水线下。
 ## 3.添加了一个wall-edge使之更加偏向与跟随建筑移动
-## TODO:如果必要，添加路径缓存机制
+## 4.添加路径缓存机制（最大 MAX_CACHE_QUEUE_SIZE 条）
 
 const ENTITY_HEIGHT := 2
 const VECTOR2I_NULL := Vector2i(-1,-1)
 const MAP_TOP_Y := 0
+const MAX_CACHE_QUEUE_SIZE := 50
 
 const PLATFROM_POINT_WEIGHT := 1
 const WALL_EDGE_POINT_WEIGHT := 5
 const AIR_POINT_WEIGHT := 1000
 
 @export var map:TileMapLayer
+@export var cache_enabled := true  # 是否启用路径缓存
 
 var astar := PVZRAStarGrid2D.new()
 var platform_path: Array[Vector2i]
@@ -27,6 +29,10 @@ var platform_down_path:Array[Vector2i]
 
 ## 存储已经验证过的出水点
 var water_out_cell:Array[Vector2i] = []
+
+## 路径缓存系统
+var path_cache := {}
+var cache_queue := []  # 用于维护缓存顺序
 
 func _ready():
 	path_finder_ready()
@@ -47,11 +53,13 @@ func path_finder_ready():
 	update_points()
 
 func update_points():
+	clear_cache()
 	for x in range(astar.region.position.x,astar.region.end.x):
 		for y in range(astar.region.position.y,astar.region.end.y):
 			update_one_cell(Vector2i(x,y))
 
 func update_one_cell(cell:Vector2i):
+	clear_cache()
 	if is_solid_cell(cell):
 		astar.set_point_solid(cell)
 	elif is_platform_cell(cell):
@@ -68,6 +76,13 @@ func update_one_cell(cell:Vector2i):
 		add_child(new_point)
 
 func get_id_path(from:Vector2i,to:Vector2i)->Array[Vector2i]:
+	# 检查缓存
+	if cache_enabled:
+		var cached_path = get_cached_path(from, to)
+		if cached_path:
+			print("缓存命中")
+			return cached_path
+
 	if from.x <= astar.region.position.x or from.x >= astar.region.end.x:
 		return []
 	
@@ -90,7 +105,42 @@ func get_id_path(from:Vector2i,to:Vector2i)->Array[Vector2i]:
 	path.append_array(astar.get_id_path(from,platfrom_to,allow_partial_path))
 	path.append(to)
 	
-	return path
+	var filtered_path = filter_path(path)
+	
+	# 更新缓存
+	if cache_enabled:
+		update_cache(from, to, filtered_path)
+	
+	return filtered_path
+
+## 缓存相关方法
+func get_cached_path(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
+	var key = _generate_cache_key(from, to)
+	var default_return :Array[Vector2i] = []
+	return path_cache.get(key,default_return)
+
+func update_cache(from: Vector2i, to: Vector2i, path: Array[Vector2i]):
+	var key = _generate_cache_key(from, to)
+	
+	# 更新缓存队列
+	if path_cache.has(key):
+		cache_queue.erase(key)
+	
+	# 添加新条目
+	path_cache[key] = path
+	cache_queue.append(key)
+	
+	# 维护缓存大小
+	while cache_queue.size() > MAX_CACHE_QUEUE_SIZE:
+		var old_key = cache_queue.pop_front()
+		path_cache.erase(old_key)
+
+func _generate_cache_key(from: Vector2i, to: Vector2i) -> String:
+	return "%d_%d_%d_%d" % [from.x, from.y, to.x, to.y]
+
+func clear_cache():
+	path_cache.clear()
+	cache_queue.clear()
 
 func is_solid_cell(cell:Vector2i)->bool:
 	## 禁止水线下的点
@@ -184,7 +234,7 @@ func filter_path(raw_path: Array[Vector2i]) -> Array[Vector2i]:
 		var current_direction := raw_path[i] - raw_path[i-1]
 		# 检测到方向变化时记录转折点
 		if current_direction != previous_direction:
-			# 过滤掉同一竖直线上连续点的路径中间点（目前只会涉及三个点）
+			# 过滤掉同一竖直线上连续点的路径中间点
 			if raw_path[i].x == raw_path[i-1].x and raw_path[i].x == raw_path[i-2].x:
 				continue
 			filtered.append(raw_path[i-1])
