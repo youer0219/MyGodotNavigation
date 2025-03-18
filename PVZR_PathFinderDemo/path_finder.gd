@@ -26,7 +26,6 @@ var platform_path: Array[Vector2i]
 var platform_edge_path:Array[Vector2i]
 var platform_down_path:Array[Vector2i]
 
-
 func _ready():
 	path_finder_ready()
 
@@ -125,3 +124,31 @@ func get_used_cells()->Array[Vector2i]:
 
 func get_top_water_cell_y()->int:
 	return 16
+
+func filter_path(raw_path: Array[Vector2i]) -> Array[Vector2i]:
+	# 处理空路径和简单路径的情况
+	if raw_path.size() <= 2:
+		return raw_path.duplicate()
+	
+	var filtered :Array[Vector2i] = [raw_path[0]]  # 起点必须保留
+	var previous_direction := raw_path[1] - raw_path[0]
+	
+	# 遍历路径寻找方向变化的关键点
+	for i in range(2, raw_path.size()):
+		
+		# 检测出水点 
+		if raw_path[i-1].y + 1 == get_top_water_cell_y() and raw_path[i].y + 1 == get_top_water_cell_y():
+			if get_used_cells().has(raw_path[i] + Vector2i.DOWN) and not get_used_cells().has(raw_path[i-1] + Vector2i.DOWN):
+				filtered.append(raw_path[i-1])
+				continue
+	
+		var current_direction := raw_path[i] - raw_path[i-1]
+		# 检测到方向变化时记录转折点
+		if current_direction != previous_direction:
+			filtered.append(raw_path[i-1])
+			previous_direction = current_direction
+	
+	# 确保终点始终保留
+	filtered.append(raw_path[-1])
+	
+	return filtered
