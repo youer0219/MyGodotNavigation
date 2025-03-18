@@ -20,7 +20,7 @@ const AIR_POINT_WEIGHT := 20
 
 @export var map:TileMapLayer
 
-var astar := AStarGrid2D.new()
+var astar := PVZRAStarGrid2D.new()
 var platform_path: Array[Vector2i]
 var platform_edge_path:Array[Vector2i]
 var platform_down_path:Array[Vector2i]
