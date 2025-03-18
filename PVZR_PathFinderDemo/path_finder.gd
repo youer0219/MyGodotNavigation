@@ -1,22 +1,22 @@
 extends Node
 class_name PathFinder
 
-## TODO: 适配 PVZR 项目的需求
-## 1.高度设置与不可达规则更新(OK)
+## 适配 PVZR 项目的需求
+## 1.高度设置与不可达规则更新
 ## 2.提供对路径的处理
 	## 2.1 路径节点数量优化，保留关键节点
 	## 2.2 传入传出都采取全局坐标以兼容
 	## 2.3 寻路路径起点终点检查更加严格。起点、终点的映射需要单独的处理逻辑，不仅仅是水线下。
-## 3.特殊：对于“水线”下的节点，将其映射到第一个平台点上进行寻路(OK)
-## 4.添加了一个wall-edge使之更加偏向与跟随建筑移动
+## 3.添加了一个wall-edge使之更加偏向与跟随建筑移动
+## TODO:如果必要，添加路径缓存机制
 
 const ENTITY_HEIGHT := 2
 const VECTOR2I_NULL := Vector2i(-1,-1)
-const MAP_HEIGHT := 24
+const MAP_TOP_Y := 0
 
 const PLATFROM_POINT_WEIGHT := 1
-const WALL_EDGE_POINT_WEIGHT := 10
-const AIR_POINT_WEIGHT := 20
+const WALL_EDGE_POINT_WEIGHT := 5
+const AIR_POINT_WEIGHT := 1000
 
 @export var map:TileMapLayer
 
@@ -49,21 +49,23 @@ func path_finder_ready():
 func update_points():
 	for x in range(astar.region.position.x,astar.region.end.x):
 		for y in range(astar.region.position.y,astar.region.end.y):
-			var cell := Vector2i(x,y)
-			if is_solid_cell(cell):
-				astar.set_point_solid(cell)
-			elif is_platform_cell(cell):
-				astar.set_point_weight_scale(cell,PLATFROM_POINT_WEIGHT)
-				var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.BLACK)
-				add_child(new_point)
-			elif is_wall_edge_cell(cell):
-				astar.set_point_weight_scale(cell,WALL_EDGE_POINT_WEIGHT)
-				var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.RED)
-				add_child(new_point)
-			else:
-				astar.set_point_weight_scale(cell,AIR_POINT_WEIGHT)
-				var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.ALICE_BLUE)
-				add_child(new_point)
+			update_one_cell(Vector2i(x,y))
+
+func update_one_cell(cell:Vector2i):
+	if is_solid_cell(cell):
+		astar.set_point_solid(cell)
+	elif is_platform_cell(cell):
+		astar.set_point_weight_scale(cell,PLATFROM_POINT_WEIGHT)
+		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.BLACK)
+		add_child(new_point)
+	elif is_wall_edge_cell(cell):
+		astar.set_point_weight_scale(cell,WALL_EDGE_POINT_WEIGHT)
+		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.RED)
+		add_child(new_point)
+	else:
+		astar.set_point_weight_scale(cell,AIR_POINT_WEIGHT)
+		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.ALICE_BLUE)
+		add_child(new_point)
 
 func get_id_path(from:Vector2i,to:Vector2i)->Array[Vector2i]:
 	if from.x <= astar.region.position.x or from.x >= astar.region.end.x:
@@ -72,28 +74,23 @@ func get_id_path(from:Vector2i,to:Vector2i)->Array[Vector2i]:
 	if not astar.is_in_boundsv(to):
 		return []
 	
-	var platfrom_from :Vector2i= find_platform_tile(from)
-	var platfrom_to := find_platform_tile(to)
-	if platfrom_to == VECTOR2I_NULL or platfrom_from == VECTOR2I_NULL:
+	var platfrom_to:Vector2i = find_platform_tile(to)
+	if platfrom_to == VECTOR2I_NULL:
 		return []
 	
-	var path:Array[Vector2i] = astar.get_id_path(platfrom_from,platfrom_to) 
+	var path:Array[Vector2i] = []
+	
+	if from.y < get_top_water_cell_y():
+		path.append(from)
+	else:
+		from = find_platform_tile(from)
+	
+	## 允许搜索一条不可达路径，用于冰车完全封闭路径时，但要求目标位于有效位置
+	var allow_partial_path:bool = not astar.is_point_solid(platfrom_to) 
+	path.append_array(astar.get_id_path(from,platfrom_to,allow_partial_path))
 	path.append(to)
 	
 	return path
-
-func get_first_top_empty_cell(cell:Vector2i)->Vector2i:
-	for top_cell_y in range(1,MAP_HEIGHT):
-		var new_cell := cell - Vector2i(0,top_cell_y)
-		if new_cell.y >= get_top_water_cell_y():
-			continue
-		if not astar.is_in_boundsv(new_cell):
-			continue
-		if get_used_cells().has(new_cell):
-			continue
-		return new_cell
-	
-	return VECTOR2I_NULL
 
 func is_solid_cell(cell:Vector2i)->bool:
 	## 禁止水线下的点
@@ -116,14 +113,14 @@ func find_platform_tile(input_coord: Vector2i) -> Vector2i:
 	
 	# 判断搜索方向
 	if current_y <= get_top_water_cell_y():
-		# 向上搜索 (Y递减)
+		## 实体高于水线时，从当前位置向下搜索，找到第一个平台点
 		for y in range(current_y, get_top_water_cell_y()):
 			var coord = Vector2i(x, y)
 			if is_platform_cell(coord):
 				return coord
 	else:
-		# 向下搜索 (Y递增)
-		for y in range(get_top_water_cell_y() - 1, 0,-1):
+		## 实体低于水线时，向上搜索，找到上面第一个平台点
+		for y in range(get_top_water_cell_y() + Vector2i.UP.y,MAP_TOP_Y,-1):
 			var coord = Vector2i(x, y)
 			if is_platform_cell(coord):
 				return coord
@@ -152,7 +149,10 @@ func is_used_cell(cell:Vector2i)->bool:
 	return get_used_cells().has(cell)
 
 func is_wall_edge_cell(cell:Vector2i)->bool:
-	return get_used_cells().has(cell + Vector2i.RIGHT) or get_used_cells().has(cell + Vector2i.LEFT)
+	return get_used_cells().has(cell + Vector2i.RIGHT) \
+	or get_used_cells().has(cell + Vector2i.LEFT)\
+	or get_used_cells().has(cell + Vector2i.DOWN + Vector2i.LEFT)\
+	or get_used_cells().has(cell + Vector2i.DOWN + Vector2i.RIGHT)
 
 func get_used_cells()->Array[Vector2i]:
 	return map.get_used_cells()
