@@ -1,5 +1,5 @@
 extends Node
-class_name PathFinder
+class_name MapPathFinder
 
 ## 适配 PVZR 项目的需求
 ## 1.高度设置与不可达规则更新
@@ -64,23 +64,17 @@ func update_one_cell(cell:Vector2i):
 		astar.set_point_solid(cell)
 	elif is_platform_cell(cell):
 		astar.set_point_weight_scale(cell,PLATFROM_POINT_WEIGHT)
-		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.BLACK)
-		add_child(new_point)
 	elif is_wall_edge_cell(cell):
 		astar.set_point_weight_scale(cell,WALL_EDGE_POINT_WEIGHT)
-		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.RED)
-		add_child(new_point)
 	else:
 		astar.set_point_weight_scale(cell,AIR_POINT_WEIGHT)
-		var new_point = ShowPointPath.CreatePathPoint(map.to_global(map.map_to_local(cell)),Color.ALICE_BLUE)
-		add_child(new_point)
+
 
 func get_id_path(from:Vector2i,to:Vector2i)->Array[Vector2i]:
 	# 检查缓存
 	if cache_enabled:
 		var cached_path = get_cached_path(from, to)
 		if cached_path:
-			print("缓存命中")
 			return cached_path
 
 	if from.x <= astar.region.position.x or from.x >= astar.region.end.x:
@@ -182,7 +176,7 @@ func is_platform_cell(coord: Vector2i) -> bool:
 	if is_used_cell(coord):
 		return false
 	
-	# 2. 上方格子无瓦片
+	# 2. 高度要求
 	for i in range(1,ENTITY_HEIGHT):
 		var above = Vector2i(coord.x, coord.y - i)
 		if coord.y > 0 and is_used_cell(above):
